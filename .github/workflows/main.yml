@@ -1,0 +1,74 @@
+name: main.yml
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+        with:
+          msbuild-version: 'latest'
+
+      - name: Build application
+        run: msbuild ./ComicWebsite/ComicWebsite.sln /p:Configuration=Release
+
+  test:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+        with:
+          msbuild-version: 'latest'
+
+      - name: Build application
+        run: msbuild ./ComicWebsite/ComicWebsite.sln /p:Configuration=Release
+
+      - name: Run tests (replace with actual test commands)
+        run: echo "Running tests..."
+
+  deploy:
+    needs: test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+        with:
+          msbuild-version: 'latest'
+
+      - name: Build application
+        run: msbuild ./ComicWebsite/ComicWebsite.sln /p:Configuration=Release
+
+      - name: Deploy to staging (replace with actual deployment steps)
+        run: echo "Deploying to staging..."
+
+  notify:
+    name: Notify team on success
+    runs-on: windows-latest
+    needs: [build, test, deploy]
+    
+    steps:
+      - name: Check for build, test, or deployment success
+        id: Check-status
+        run: echo "Build, test, and deployment successful!"
+        
+      - name: Send notification on success
+        if: steps.build.outcome == 'success' && steps.test.outcome == 'success' && steps.deploy.outcome == 'success'
+        run: echo "Build, test, and deployment successful! Notify the team"
